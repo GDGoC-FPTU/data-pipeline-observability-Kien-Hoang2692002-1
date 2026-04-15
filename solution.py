@@ -2,7 +2,7 @@
 ==============================================================
 Day 10 Lab: Build Your First Automated ETL Pipeline
 ==============================================================
-Student ID: AI20K-XXXX  (<-- Thay XXXX bang ma so cua ban)
+Student ID: AI20K-00077  (<-- Thay XXXX bang ma so cua ban)
 Name: Your Name Here
 
 Nhiem vu:
@@ -44,10 +44,9 @@ def extract(file_path):
     print(f"Extracting data from {file_path}...")
     # TODO: Viet code doc file JSON o day
     # Vi du:
-    #   with open(file_path, 'r') as f:
-    #       data = json.load(f)
-    #   return data
-    pass
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+    return data
 
 
 def validate(data):
@@ -69,10 +68,16 @@ def validate(data):
     valid_records = []
     error_count = 0
 
-    # TODO: Lap qua data, kiem tra tung record
-    # Giu lai record hop le, dem record loi
+    for record in data:
+        price = record.get('price', 0)
+        category = record.get('category')
 
-    print(f"Validation complete. Valid: {len(valid_records)}, Errors: {error_count}")
+        if price > 0 and category:
+            valid_records.append(record)
+        else:
+            error_count += 1
+
+    print(f"Validation summary: {len(valid_records)} kept, {error_count} dropped")
     return valid_records
 
 
@@ -95,7 +100,11 @@ def transform(data):
         pd.DataFrame: DataFrame da duoc transform
     """
     # TODO: Tao DataFrame va ap dung transformations
-    pass
+    pd_df = pd.DataFrame(data)
+    pd_df['discounted_price'] = pd_df['price'] * 0.9
+    pd_df['category'] = pd_df['category'].str.title()
+    pd_df['processed_at'] = datetime.datetime.now().isoformat()
+    return pd_df
 
 
 def load(df, output_path):
@@ -106,6 +115,7 @@ def load(df, output_path):
        - df.to_csv(output_path, index=False)
     """
     # TODO: Luu DataFrame ra CSV
+    df.to_csv(output_path, index=False)
     print(f"Data saved to {output_path}")
 
 
